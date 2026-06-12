@@ -1,6 +1,9 @@
 # Amazon Product Recommendation Engine & Discovery Dashboard
 
+**Author: Prerna Srivastava** | *Machine Learning Project*
+
 This repository contains the end-to-end design, benchmarking, and implementation of five distinct recommendation architectures built on Amazon's electronic product reviews dataset. To understand the practical engineering trade-offs of recommendation systems, I implemented neighborhood-based collaborative filtering, latent factor models (SVD), and ensemble hybrid architectures.
+
 
 To demonstrate the models in a production-like scenario, I built a premium, dark glassmorphic **Streamlit discovery dashboard**. The dashboard provides interactive user recommendations, Explainable AI (XAI) confidence breakdowns, natural language catalog searching, and modular analytical charts.
 
