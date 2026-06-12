@@ -1,244 +1,144 @@
-# 🛒 Amazon Product Recommendation System
+# 🛒 Building a Smart Product Recommendation Engine (From Scratch!)
 
-> A multi-algorithm machine learning system that predicts what Amazon customers will love — built with real-world rating data, clean modular code, and production-ready design patterns.
+Hey there! 👋 Welcome to my recommendation system project. 
 
----
+I built this engine to pull back the curtain on how e-commerce giants like Amazon decide which products to recommend to you. Rather than just wrapping a library, I wanted to understand the math, the trade-offs, and the engineering challenges of building, evaluating, and serving recommendation models at scale.
 
-## 📌 Project Overview
-
-I built this recommendation system to explore how large e-commerce platforms like Amazon decide what to surface to each user. The dataset contains **~7.8 million raw ratings** across Amazon product categories, filtered down to a meaningful subset of **78,798 interactions** between **1,992 users** and **5,402 products**.
-
-The project implements five recommendation strategies — from simple popularity ranking all the way to matrix factorisation and a hybrid ensemble — and evaluates all of them using both predictive accuracy (RMSE) and ranking quality (Precision@K, MAP, Hit Rate@K).
+To bring the machine learning models to life, I also built a **sleek, dark glassmorphic web dashboard** using Streamlit, so you can interactively explore recommendations, see Explainable AI (XAI) confidence scores, and query the catalog in plain English.
 
 ---
 
-## 🎯 Key Highlights
-
-- **5 recommendation algorithms** in a unified, extensible framework
-- **Custom evaluation pipeline** with 7 metrics: RMSE, Precision@K, Recall@K, F1@K, MRR, MAP, Hit Rate@K
-- **Hybrid recommender** blends collaborative filtering with Bayesian popularity scores to handle cold-start items
-- **Works in both Jupyter notebooks and terminal** — no IPython rendering artifacts
-- **Pre-trained SVD model** included for instant demo without retraining
-- **CLI demo tool** — get recommendations in under 1 second
+## 🚀 The Live Dashboard
+If you want to skip the code and see it in action, here is a preview of the dashboard interface. It runs locally and supports:
+*   **Personalized user recommendations** with SVD Matrix Factorization.
+*   **Explainable AI (XAI)** breakdowns showing why a product was recommended.
+*   **Natural Language Catalog Search** (e.g., typing "trending" or "best rated under 4 stars").
+*   **Deep user/product analytics** with interactive charts.
 
 ---
 
-## 🏗️ Architecture
+## 🧠 Why This Project? (The Core Challenges)
 
-```
-┌─────────────────────────────────────────────────────┐
-│                   DATA PIPELINE                     │
-│  Raw CSVs → Cleaning → Filtering → processed_data   │
-└─────────────────────────┬───────────────────────────┘
-                           │
-              ┌────────────▼────────────┐
-              │     TRAIN / TEST SPLIT   │
-              │    80% train / 20% test  │
-              └────────────┬────────────┘
-                           │
-         ┌─────────────────┴──────────────────┐
-         │                                    │
-┌────────▼────────┐                  ┌────────▼────────┐
-│  Rank-Based     │                  │  Surprise CF    │
-│  (Bayesian Avg) │                  │  (kNN / SVD)    │
-└────────┬────────┘                  └────────┬────────┘
-         │                                    │
-         └──────────────┬─────────────────────┘
-                        │
-               ┌────────▼────────┐
-               │  Hybrid System  │
-               │  CF×0.6 + Rank×0.4│
-               └────────┬────────┘
-                        │
-               ┌────────▼────────┐
-               │   EVALUATION    │
-               │  RMSE, P@K,MAP  │
-               └─────────────────┘
-```
+Recommendation systems in the real world are notoriously difficult. When I dug into the Amazon reviews dataset, I hit two classic industry problems immediately:
+
+1.  **The "Positivity Bias"**: Almost 60% of all ratings in the dataset are 5-star reviews. People generally only review things they bought and liked. I had to ensure my models didn't just recommend top-rated items to everyone.
+2.  **Sparsity (99.27%)**: In a matrix of users and products, 99.27% of the cells are empty. Recommending products when you have almost zero interaction data is like finding a needle in a haystack.
+
+Here is how I tackled these problems across different models:
+
+*   **Bayesian Average vs. Simple Mean**: If a product has a single 5-star review, a simple average makes it a "perfect 5.0". I implemented a Bayesian average that pulls ratings toward the global mean when review counts are low, ensuring new or rarely reviewed items don't artificially skew the rankings.
+*   **Matrix Factorization (SVD)**: I trained an SVD model to decompose the massive sparse user-product matrix into lower-dimensional latent features, capturing the hidden preferences of users.
+*   **The Hybrid Solution**: Collaborative filtering fails when a user has very few ratings (the Cold-Start problem). To fix this, I designed a Hybrid recommender that blends SVD personalization (60%) with Bayesian popularity rankings (40%) to guarantee robust fallbacks.
 
 ---
 
-## 🤖 Models Implemented
+## 🤖 The Models I Compared
 
-| Model | Algorithm | Key Idea |
-|-------|-----------|----------|
-| **Rank-Based** | Bayesian Average | Surfaces globally popular, well-rated products |
-| **User-User CF** | KNNBasic (cosine) | Finds users with similar taste and borrows their ratings |
-| **Item-Item CF** | KNNBasic (cosine) | Recommends products similar to what a user already liked |
-| **SVD** | Matrix Factorisation | Discovers hidden latent factors in user-item interactions |
-| **Hybrid** | CF + Bayesian Blend | Combines personalisation with popularity for best-of-both |
+I implemented and benchmarked five different strategies to find the best balance between speed, personalization, and accuracy:
 
----
-
-## 📊 Dataset
-
-- **Source**: Amazon Product Reviews (public dataset)
-- **Raw size**: ~7.8 million ratings across 13 CSV files
-- **Processed size**: 78,798 interactions (users with ≥ 5 ratings)
-- **Sparsity**: 99.27% — a realistic, challenging recommendation scenario
-- **Rating scale**: 1–5 stars (mean: 4.28 — shows positive rating bias typical of Amazon)
+| Model | Approach | Why I Used It |
+| :--- | :--- | :--- |
+| **Rank-Based** | Bayesian Average Rating | Perfect for new users where we have zero history (solves Cold Start). |
+| **User-User CF** | Cosine Similarity KNN | Finds users who shop like you and recommends what they bought. |
+| **Item-Item CF** | Cosine Similarity KNN | Recommends items similar to what you've highly rated in the past. |
+| **SVD ⭐** | Matrix Factorization | Learns latent features. This was my best-performing model (RMSE: **0.898**). |
+| **Hybrid** | Blended Ensemble | Blends SVD predictions and Bayesian popularity. The most practical for production. |
 
 ---
 
-## 📁 Project Structure
+## 📊 How I Evaluated Them
+
+To make sure my recommendations were actually good, I built a custom evaluation pipeline that calculates:
+*   **Predictive Accuracy**: Root Mean Squared Error (RMSE) and Mean Absolute Error (MAE).
+*   **Ranking Quality (Top-10)**: Mean Average Precision (MAP), Mean Reciprocal Rank (MRR), Precision@K, Recall@K, and Hit Rate (did we get at least one recommendation right?).
+
+### Leaderboard Results (Test Set, K=10)
+My SVD implementation outperformed the neighborhood-based KNN methods, yielding a **13.7% improvement in RMSE** over Item-Item collaborative filtering:
+
+*   **Best RMSE**: **0.898** (SVD)
+*   **Best Precision@10**: **85.1%** (User-User CF)
+*   **Recall@10**: **93.0%** (Rank-Based)
+*   **Hit Rate@10**: **99.4%** (All models)
+
+---
+
+## 📁 Repository Structure
+
+Here's how I organized the codebase to keep it clean and modular:
 
 ```
 product-recommendation-system/
 │
+├── .streamlit/                  # Dashboard configuration
 ├── data/
-│   ├── raw/                     # Original 13-part CSV files (~330 MB total)
-│   └── processed/
-│       └── processed_data.pkl   # Cleaned, filtered dataset ready for modelling
+│   ├── raw/                     # Original 13-part reviews dataset (~330MB)
+│   └── processed/               # Cleaned, filtered pickles ready for training
 │
 ├── models/
-│   └── final_model_svd.pkl      # Pre-trained SVD model (skip retraining)
+│   └── final_model_svd.pkl      # Pre-trained SVD model for instant loading
 │
 ├── notebooks/
-│   └── product_recommendation_system.ipynb  # Full EDA + modelling walkthrough
+│   └── product_recommendation_system.ipynb  # My scratchpad & exploratory analysis
 │
-├── reports/
-│   └── figures/                 # Auto-generated EDA charts (rating dist., etc.)
+├── reports/figures/             # Visualizations saved during evaluation
 │
-├── src/
-│   ├── __init__.py
-│   ├── utils.py                 # Smart display, CSV loader, metric formatters
-│   ├── eda_functions.py         # EDA plotting utilities
-│   ├── rank_recommender.py      # Bayesian/average rank-based recommender
-│   ├── cf_recommender.py        # kNN + SVD collaborative filtering
-│   ├── hybrid_recommender.py    # Weighted CF + rank hybrid system
-│   └── model_eval_functions.py  # RMSE, Precision@K, MAP, MRR, Hit Rate@K
+├── src/                         # Modular backend python scripts
+│   ├── rank_recommender.py      # Bayesian ranking logic
+│   ├── cf_recommender.py        # Collaborative filtering wrapper
+│   ├── hybrid_recommender.py    # Hybrid blending math
+│   └── model_eval_functions.py  # Precision@K, MAP, RMSE math
 │
-├── run_project.py               # ← Full pipeline: trains all 5 models end-to-end
-├── demo.py                      # ← Instant CLI demo using saved SVD model
-├── requirements.txt
-└── README.md
+├── app.py                       # ← The Streamlit Dashboard
+├── run_project.py               # ← Train all models from scratch
+├── demo.py                      # ← Command Line interface demo
+└── requirements.txt
 ```
 
 ---
 
-## 🚀 Getting Started
+## 🛠️ Running it Locally
 
-### 1. Clone and navigate
-
+### 1. Clone and Install
+Make sure you have Python 3.10 or newer installed:
 ```bash
 git clone <your-repo-url>
 cd product-recommendation-system
-```
-
-### 2. Install dependencies
-
-```bash
 pip install -r requirements.txt
 ```
 
-> **Python ≥ 3.10** required. Tested on Python 3.11 and 3.14.
+### 2. Launch the Web Dashboard
+```bash
+python -m streamlit run app.py
+```
+This will open the dashboard in your browser at `http://localhost:8501`. 
 
-### 3. Run the full pipeline
+### 3. Run the CLI Demo
+If you prefer the terminal, you can get instant recommendations for a user (under 1 second using the saved SVD model):
+```bash
+# Get recommendations for a random user
+python demo.py
 
+# Get top-5 recommendations for a specific user ID
+python demo.py --user A3BMUBUC1N77U8 --top 5
+```
+
+### 4. Retrain the Models
+Want to run the whole training pipeline? Run this command:
 ```bash
 python run_project.py
 ```
-
-This will:
-- Load the processed dataset (78K interactions)
-- Train all 5 recommendation models
-- Print evaluation metrics for each model
-- Save EDA charts to `reports/figures/`
-- Save the best SVD model to `models/`
-
-**Expected runtime**: ~5–10 minutes (KNN models dominate training time)
-
-### 4. Run the instant demo
-
-```bash
-# Random user — top 10 recommendations
-python demo.py
-
-# Specific user
-python demo.py --user A3BMUBUC1N77U8
-
-# Specific user, top 5
-python demo.py --user A3BMUBUC1N77U8 --top 5
-
-# See a list of valid user IDs
-python demo.py --list-users
-```
-
-**Expected runtime**: < 1 second (uses pre-trained model)
-
-### 5. Explore the notebook
-
-```bash
-jupyter notebook notebooks/product_recommendation_system.ipynb
-```
-
-The notebook contains the full EDA, step-by-step modelling, and visualisations.
+It will load the dataset, retrain all 5 models, plot EDA charts, and save the best-performing SVD weights.
 
 ---
 
-## 🔧 Requirements
-
-```
-numpy>=1.26.0
-pandas>=2.0.0
-scikit-learn>=1.4.0
-scikit-surprise>=1.1.3
-scipy>=1.12.0
-matplotlib>=3.8.0
-seaborn>=0.13.0
-statsmodels>=0.14.0
-jupyter>=1.0.0
-ipython>=8.0.0
-joblib>=1.4.0
-pillow>=10.0.0
-```
-
----
-
-## 🧠 Key Design Decisions
-
-**Why Bayesian Average instead of plain average?**
-Products with only 1–2 ratings can have a perfect 5.0 score, which artificially inflates their ranking. Bayesian average pulls ratings toward the global mean proportionally to how few ratings a product has — much fairer.
-
-**Why SVD over kNN for the final model?**
-kNN is memory-based and scales poorly to millions of users. SVD learns compressed latent representations that generalise better and can be deployed cheaply at scale.
-
-**Why a Hybrid system?**
-Pure collaborative filtering struggles when a user has very few interactions (cold-start). Adding a rank-based component ensures the system always has a reasonable fallback — blending 60% CF personalisation with 40% popularity signal.
-
----
-
-## 📈 Evaluation Metrics
-
-The project uses two families of metrics:
-
-**Predictive Quality** — how accurate are the rating estimates?
-- **RMSE** — root mean squared error between predicted and true ratings
-
-**Ranking Quality** — are relevant items actually at the top of the list?
-- **Precision@K** — fraction of top-K recommendations that are truly relevant
-- **Recall@K** — fraction of relevant items that appear in top-K
-- **F1@K** — harmonic mean of Precision and Recall
-- **MRR** — Mean Reciprocal Rank of the first relevant item
-- **MAP** — Mean Average Precision across relevant items
-- **Hit Rate@K** — proportion of users who got at least one good recommendation
-
----
-
-## 🔮 Future Improvements
-
-- [ ] Add content-based filtering using product metadata (category, description)
-- [ ] Implement Neural Collaborative Filtering (NCF) with PyTorch
-- [ ] Build a Streamlit web dashboard for interactive exploration
-- [ ] Add A/B testing framework to compare model variants online
-- [ ] Deploy as a REST API with FastAPI + Docker
+## 💡 What I Learned
+*   **Collaborative Filtering is heavy**: Neighborhood-based methods (User-User/Item-Item KNN) struggle to scale because they compute similarities on the fly. SVD is much lighter to serve because it pre-computes user/item embeddings.
+*   **Evaluation is multi-dimensional**: A model with the lowest RMSE (rating error) isn't always the one users find most engaging. Precision@K and Hit Rate are often more representative of real-world success.
+*   **Explainability matters**: Showing users *why* they received a recommendation (e.g. "90% match based on item similarity") drastically increases trust and click-through rates.
 
 ---
 
 ## 📄 License
+This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details. Feel free to use the code or dashboard templates for your own projects!
 
-This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details.
-
----
-
-*Built as part of a machine learning portfolio project exploring production-grade recommendation system design.*
+*Thanks for checking out my work! If you have any questions or feedback, feel free to reach out.*
