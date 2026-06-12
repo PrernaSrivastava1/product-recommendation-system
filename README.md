@@ -170,6 +170,7 @@ It will load the dataset, retrain all 5 models, plot EDA charts, and save the be
 ---
 
 ## 📄 License
-This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details. Feel free to use the code or dashboard templates for your own projects!
+This project is licensed under the MIT License — see [LICENSE.txt](LICENSE.txt) for details. Feel free to use the code or dashboard templates for your own projects but before that give a :star:!
 
 *Thanks for checking out my work! If you have any questions or feedback, feel free to reach out.*
+
