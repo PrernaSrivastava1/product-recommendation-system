@@ -1,6 +1,6 @@
-# 🛒 Amazon Product Recommendation System
+# 🛒 Smart Product Discovery & Recommendation Engine
 
-> A multi-algorithm machine learning system that predicts what Amazon customers will love — built with real-world rating data, clean modular code, and production-ready design patterns.
+> A multi-algorithm machine learning system that predicts what Amazon customers will love — built with real-world rating data, clean modular code, a custom evaluation pipeline, and an interactive, state-of-the-art Streamlit dashboard.
 
 ---
 
@@ -8,22 +8,24 @@
 
 I built this recommendation system to explore how large e-commerce platforms like Amazon decide what to surface to each user. The dataset contains **~7.8 million raw ratings** across Amazon product categories, filtered down to a meaningful subset of **78,798 interactions** between **1,992 users** and **5,402 products**.
 
-The project implements five recommendation strategies — from simple popularity ranking all the way to matrix factorisation and a hybrid ensemble — and evaluates all of them using both predictive accuracy (RMSE) and ranking quality (Precision@K, MAP, Hit Rate@K).
+The project implements five recommendation strategies — from simple popularity ranking to matrix factorisation and a hybrid ensemble — and evaluates them using both predictive accuracy (RMSE) and ranking quality (Precision@K, MAP, Hit Rate@K).
+
+To make the ML insights interactive, I developed a production-ready **Streamlit web dashboard** featuring a premium dark glassmorphism user interface, interactive Plotly visualisations, natural language catalog search, and Explainable AI (XAI) confidence score breakdowns.
 
 ---
 
 ## 🎯 Key Highlights
 
-- **5 recommendation algorithms** in a unified, extensible framework
-- **Custom evaluation pipeline** with 7 metrics: RMSE, Precision@K, Recall@K, F1@K, MRR, MAP, Hit Rate@K
-- **Hybrid recommender** blends collaborative filtering with Bayesian popularity scores to handle cold-start items
-- **Works in both Jupyter notebooks and terminal** — no IPython rendering artifacts
-- **Pre-trained SVD model** included for instant demo without retraining
-- **CLI demo tool** — get recommendations in under 1 second
+- **5 Recommendation Algorithms**: Unified, modular implementations of Rank-Based (Bayesian), User-User CF, Item-Item CF, SVD Matrix Factorisation, and Hybrid blending.
+- **Premium Dark Glassmorphic Dashboard**: A state-of-the-art Streamlit UI featuring backdrop blurs, subtle glowing elements, and responsive layouts.
+- **Explainable AI (XAI)**: Visual breakdown of why each product is recommended (Collaborative Filtering personalization vs. popularity vs. Bayesian ranking).
+- **Natural Language Discovery**: Interactive search that parses query parameters (e.g. "trending", "under 4 stars") and filters catalog datasets in real-time.
+- **Custom Evaluation Pipeline**: Evaluates models across 7 key metrics: RMSE, MAE, Precision@K, Recall@K, F1@K, MRR, MAP, and Hit Rate@K.
+- **Pre-trained SVD Model**: Included for instant demo predictions without retraining.
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ System Architecture
 
 ```
 ┌─────────────────────────────────────────────────────┐
@@ -36,24 +38,29 @@ The project implements five recommendation strategies — from simple popularity
               │    80% train / 20% test  │
               └────────────┬────────────┘
                            │
-         ┌─────────────────┴──────────────────┐
-         │                                    │
-┌────────▼────────┐                  ┌────────▼────────┐
-│  Rank-Based     │                  │  Surprise CF    │
-│  (Bayesian Avg) │                  │  (kNN / SVD)    │
-└────────┬────────┘                  └────────┬────────┘
-         │                                    │
-         └──────────────┬─────────────────────┘
-                        │
-               ┌────────▼────────┐
-               │  Hybrid System  │
-               │  CF×0.6 + Rank×0.4│
-               └────────┬────────┘
-                        │
-               ┌────────▼────────┐
-               │   EVALUATION    │
-               │  RMSE, P@K,MAP  │
-               └─────────────────┘
+          ┌─────────────────┴──────────────────┐
+          │                                    │
+ ┌────────▼────────┐                  ┌────────▼────────┐
+ │  Rank-Based     │                  │  Surprise CF    │
+ │  (Bayesian Avg) │                  │  (kNN / SVD)    │
+ └────────┬────────┘                  └────────┬────────┘
+          │                                    │
+          └──────────────┬─────────────────────┘
+                         │
+                ┌────────▼────────┐
+                │  Hybrid System  │
+                │  CF×0.6 + Rank×0.4│
+                └────────┬────────┘
+                         │
+                ┌────────▼────────┐
+                │   EVALUATION    │
+                │  RMSE, P@K,MAP  │
+                └────────┬────────┘
+                         │
+        ┌────────────────▼────────────────┐
+        │   STREAMLIT DARK DASHBOARD      │
+        │ Personalization, Search & Stats │
+        └─────────────────────────────────┘
 ```
 
 ---
@@ -62,11 +69,11 @@ The project implements five recommendation strategies — from simple popularity
 
 | Model | Algorithm | Key Idea |
 |-------|-----------|----------|
-| **Rank-Based** | Bayesian Average | Surfaces globally popular, well-rated products |
+| **Rank-Based** | Bayesian Average | Surfaces globally popular, well-rated products (ignores sparse average bias) |
 | **User-User CF** | KNNBasic (cosine) | Finds users with similar taste and borrows their ratings |
 | **Item-Item CF** | KNNBasic (cosine) | Recommends products similar to what a user already liked |
-| **SVD** | Matrix Factorisation | Discovers hidden latent factors in user-item interactions |
-| **Hybrid** | CF + Bayesian Blend | Combines personalisation with popularity for best-of-both |
+| **SVD** | Matrix Factorisation | Discovers hidden latent factors in user-item interactions (Best RMSE: **0.898**) |
+| **Hybrid** | CF + Bayesian Blend | Combines SVD personalisation (60%) with Bayesian popularity (40%) to handle cold-starts |
 
 ---
 
@@ -84,6 +91,9 @@ The project implements five recommendation strategies — from simple popularity
 
 ```
 product-recommendation-system/
+│
+├── .streamlit/
+│   └── config.toml              # Streamlit configuration
 │
 ├── data/
 │   ├── raw/                     # Original 13-part CSV files (~330 MB total)
@@ -108,6 +118,7 @@ product-recommendation-system/
 │   ├── hybrid_recommender.py    # Weighted CF + rank hybrid system
 │   └── model_eval_functions.py  # RMSE, Precision@K, MAP, MRR, Hit Rate@K
 │
+├── app.py                       # ← Streamlit dashboard entrypoint
 ├── run_project.py               # ← Full pipeline: trains all 5 models end-to-end
 ├── demo.py                      # ← Instant CLI demo using saved SVD model
 ├── requirements.txt
@@ -133,7 +144,15 @@ pip install -r requirements.txt
 
 > **Python ≥ 3.10** required. Tested on Python 3.11 and 3.14.
 
-### 3. Run the full pipeline
+### 3. Run the interactive web dashboard
+
+```bash
+python -m streamlit run app.py
+```
+
+This launches the web UI in your browser at `http://localhost:8501`.
+
+### 4. Run the full training pipeline
 
 ```bash
 python run_project.py
@@ -148,7 +167,7 @@ This will:
 
 **Expected runtime**: ~5–10 minutes (KNN models dominate training time)
 
-### 4. Run the instant demo
+### 5. Run the instant CLI demo
 
 ```bash
 # Random user — top 10 recommendations
@@ -165,33 +184,6 @@ python demo.py --list-users
 ```
 
 **Expected runtime**: < 1 second (uses pre-trained model)
-
-### 5. Explore the notebook
-
-```bash
-jupyter notebook notebooks/product_recommendation_system.ipynb
-```
-
-The notebook contains the full EDA, step-by-step modelling, and visualisations.
-
----
-
-## 🔧 Requirements
-
-```
-numpy>=1.26.0
-pandas>=2.0.0
-scikit-learn>=1.4.0
-scikit-surprise>=1.1.3
-scipy>=1.12.0
-matplotlib>=3.8.0
-seaborn>=0.13.0
-statsmodels>=0.14.0
-jupyter>=1.0.0
-ipython>=8.0.0
-joblib>=1.4.0
-pillow>=10.0.0
-```
 
 ---
 
@@ -229,9 +221,8 @@ The project uses two families of metrics:
 
 - [ ] Add content-based filtering using product metadata (category, description)
 - [ ] Implement Neural Collaborative Filtering (NCF) with PyTorch
-- [ ] Build a Streamlit web dashboard for interactive exploration
-- [ ] Add A/B testing framework to compare model variants online
 - [ ] Deploy as a REST API with FastAPI + Docker
+- [ ] Add A/B testing framework to compare model variants online
 
 ---
 
