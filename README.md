@@ -8,12 +8,43 @@ To bring the machine learning models to life, I also built a **sleek, dark glass
 
 ---
 
-## 🚀 The Live Dashboard
-If you want to skip the code and see it in action, here is a preview of the dashboard interface. It runs locally and supports:
-*   **Personalized user recommendations** with SVD Matrix Factorization.
-*   **Explainable AI (XAI)** breakdowns showing why a product was recommended.
-*   **Natural Language Catalog Search** (e.g., typing "trending" or "best rated under 4 stars").
-*   **Deep user/product analytics** with interactive charts.
+## 🚀 Deployed Web Dashboard Walkthrough
+
+To bring the machine learning models to life, I built a highly interactive, premium dark-themed Streamlit dashboard. It starts with the sidebar collapsed by default to maximize graph real estate. Below is a detailed walkthrough of each page in the application:
+
+### 1. 📊 Executive Summary
+The command center of the system. It displays high-level business KPIs (Total interactions, unique users/products, model metrics) alongside an interactive rating distribution chart. It features the system architecture summary and a styled leaderboard comparing all model metrics.
+![Executive Summary](reports/figures/dashboard_executive_summary.png)
+
+### 2. 🎯 Smart Recommendations + Explainable AI (XAI)
+This page is where SVD Matrix Factorization generates personalized product feeds. Crucially, it includes an **Explainable AI (XAI)** breakdown bar for each recommendation, showing how much Collaborative Filtering (SVD), product popularity, and Bayesian rank contributed to the recommendation. It also includes user analytics (e.g. historical rating profiles).
+![Smart Recommendations](reports/figures/dashboard_smart_recommendations.png)
+
+### 3. 🔍 Plain-English Natural Language Product Catalog Search
+An intuitive catalog exploration search bar. Users can type natural phrases like "trending products" or "highest rated under 4 stars" and the engine parsed search filters to return matches instantly.
+![Product Discovery](reports/figures/dashboard_product_discovery.png)
+
+### 4. 📈 ML Analytics & Validation Suite
+A dedicated verification page showing the performance tables for all 5 models side-by-side. It features responsive visualization tabs comparing key metrics like RMSE, Precision@K, and Recall@K.
+![ML Analytics](reports/figures/dashboard_ml_analytics.png)
+
+### 5. 🛍️ Product Intelligence
+A deep dive into the product catalog, categorizing items by "Most Popular", "Highest Rated", and "Trending". It features interactive distribution plots showing catalog-wide review counts.
+![Product Intelligence](reports/figures/dashboard_product_intelligence.png)
+
+### 6. 👥 User Insights & Engagement Segmentation
+An exploratory profile page displaying user rating patterns. It categorizes users into segments ("Casual", "Light", "Regular", "Active", "Power") based on interaction frequencies, helping explain which cohort drives the collaborative filtering signals.
+![User Insights](reports/figures/dashboard_user_insights.png)
+
+### 7. 🤖 Model Comparison & Algorithm Explainer
+Allows direct comparison of the five deployed recommendation models. It includes a card deck highlighting the best RMSE model and detailed explainers describing the formulas and mathematical goals of each model.
+![Model Comparison](reports/figures/dashboard_model_comparison.png)
+
+### 8. ⚡ Performance Charts
+A performance visualizer containing interactive heatmaps, line charts, and histograms representing rating distributions, error trends, and Bayesian score weights.
+![Performance Charts](reports/figures/dashboard_performance_charts.png)
+
+
 
 ---
 

@@ -18,7 +18,7 @@ st.set_page_config(
     page_title="Smart Product Discovery Engine",
     page_icon="🛒",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # ── Paths ──────────────────────────────────────────────────────────────────
@@ -64,13 +64,13 @@ st.markdown(f"""
 
 /* ── Force LIGHT/SILVER text everywhere in main area ─────────── */
 .stApp p, .stApp li,
-.stApp label, .stApp small, .stApp strong, .stApp b,
+.stApp label, .stApp small,
 .element-container p, .element-container li,
-[data-testid="stMarkdownContainer"],
-[data-testid="stMarkdownContainer"] *,
+[data-testid="stMarkdownContainer"] p,
+[data-testid="stMarkdownContainer"] li,
 [data-testid="stText"],
 .stMarkdown p, .stMarkdown li {{
-    color: {C_TEXT} !important;
+    color: {C_TEXT};
 }}
 .stApp strong, .stApp b {{ font-weight: 700 !important; color: #FFFFFF !important; }}
 
@@ -668,7 +668,7 @@ if page == "exec":
                 marker_color=[C_GOLD,"#FFB347",C_ORANGE,"#E88000",C_BURN],
                 marker_line_color="#A37000", marker_line_width=1,
                 text=[f"{v/len(df)*100:.1f}%" for v in rc.values],
-                textposition="outside", textfont=dict(color=C_DARK, size=11),
+                textposition="outside", textfont=dict(color="#FFFFFF", size=11),
             ))
             base_layout(fig, height=260, showlegend=False)
             fig.update_xaxes(title_text="Stars")
@@ -805,7 +805,7 @@ elif page == "recs":
             x=ud.index.astype(str), y=ud.values,
             marker_color=[C_GOLD,"#FFB347",C_ORANGE,"#E88000",C_BURN],
             text=ud.values, textposition="outside",
-            textfont=dict(color=C_DARK, size=10),
+            textfont=dict(color="#FFFFFF", size=10),
         ))
         base_layout(fig_u, height=200, showlegend=False)
         fig_u.update_xaxes(title_text="Stars")
@@ -905,7 +905,7 @@ elif page == "search":
                         colorscale=[[0,C_GOLD],[0.5,C_ORANGE],[1,C_BURN]],
                         showscale=True,
                         colorbar=dict(title="Bayesian Score",
-                                      tickfont=dict(color=C_DARK))),
+                                      tickfont=dict(color="#FFFFFF"))),
             hovertemplate="<b>%{customdata}</b><br>Reviews: %{x}<br>Avg: %{y:.2f}<extra></extra>",
             customdata=ps["prod_id"],
         ))
@@ -973,14 +973,14 @@ elif page == "analytics":
                 line_color=MODEL_COLORS[i], opacity=0.75,
             ))
         fig.update_layout(
-            polar=dict(bgcolor="#FAFAFA",
+            polar=dict(bgcolor="rgba(25, 32, 51, 0.4)",
                 radialaxis=dict(visible=True, range=[0.85,1.0],
-                    tickfont=dict(color=C_SUB), gridcolor="#DDD"),
-                angularaxis=dict(tickfont=dict(color=C_DARK, size=11))),
-            paper_bgcolor=C_CARD, font=dict(color=C_DARK),
-            title=dict(text="Radar — All Ranking Metrics", font=dict(color=C_DARK,size=13)),
+                    tickfont=dict(color=C_SUB), gridcolor="rgba(255,255,255,0.08)"),
+                angularaxis=dict(tickfont=dict(color="#FFFFFF", size=11))),
+            paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#FFFFFF"),
+            title=dict(text="Radar — All Ranking Metrics", font=dict(color="#FFFFFF",size=13)),
             height=460,
-            legend=dict(bgcolor="#F9F9F9", bordercolor="#DDD", borderwidth=1),
+            legend=dict(bgcolor="rgba(25, 32, 51, 0.6)", bordercolor="rgba(255,255,255,0.1)", borderwidth=1),
         )
         st.plotly_chart(fig, key="an_radar")
         st.markdown('<div class="insight-box">📌 Larger shaded area = better overall performance. SVD and Rank-Based dominate most axes.</div>', unsafe_allow_html=True)
@@ -1007,7 +1007,7 @@ elif page == "products":
             x=top_p["count"], y=top_p["prod_id"], orientation="h",
             marker_color=C_ORANGE, marker_line_color=C_BURN, marker_line_width=1,
             text=top_p["count"].astype(str), textposition="outside",
-            textfont=dict(color=C_DARK, size=9),
+            textfont=dict(color="#FFFFFF", size=9),
         ))
         base_layout(fig, height=520, title="Top 20 Most Reviewed Products", showlegend=False)
         fig.update_xaxes(title_text="Rating Count")
@@ -1022,7 +1022,7 @@ elif page == "products":
             x=top_r["mean"], y=top_r["prod_id"], orientation="h",
             marker_color=[C_BURN if v>=4.9 else C_ORANGE if v>=4.5 else C_GOLD for v in top_r["mean"]],
             text=top_r["mean"].round(3).astype(str), textposition="outside",
-            textfont=dict(color=C_DARK, size=9),
+            textfont=dict(color="#FFFFFF", size=9),
         ))
         base_layout(fig2, height=520, title="Top 20 Highest Rated (min 10 reviews)", showlegend=False)
         fig2.update_xaxes(title_text="Average Rating", range=[4.0,5.15])
@@ -1040,12 +1040,12 @@ elif page == "products":
             hover_data={"prod_id":True,"count":True,"mean":":.2f","bayesian":":.3f"},
             title="Trending: Bayesian Score vs Popularity (top 50)",
         )
-        fig3.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="#FAFAFA",
-                           font=dict(color=C_DARK), height=420,
+        fig3.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="rgba(0,0,0,0)",
+                           font=dict(color="#FFFFFF"), height=420,
                            margin=dict(t=44,b=20,l=40,r=20),
-                           title_font=dict(size=13, color=C_DARK))
-        fig3.update_xaxes(title_text="Rating Count", gridcolor="#EEE", color=C_DARK)
-        fig3.update_yaxes(title_text="Average Rating", gridcolor="#EEE", color=C_DARK)
+                           title_font=dict(size=13, color="#FFFFFF"))
+        fig3.update_xaxes(title_text="Rating Count", gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
+        fig3.update_yaxes(title_text="Average Rating", gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
         st.plotly_chart(fig3, key="prod_trend")
         st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1116,7 +1116,7 @@ elif page == "users":
             marker_colors=[C_GOLD,C_ORANGE,C_BURN,C_TEAL,C_NAV],
             textinfo="label+percent", hole=0.4,
         ))
-        fig3.update_layout(paper_bgcolor=C_CARD, font=dict(color=C_DARK),
+        fig3.update_layout(paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#FFFFFF"),
                             height=300, margin=dict(t=20,b=10),
                             legend=dict(bgcolor="#F9F9F9"))
         st.plotly_chart(fig3, key="usr_seg")
@@ -1132,12 +1132,12 @@ elif page == "users":
                       color="Avg Rating",
                       color_continuous_scale=[[0,C_GOLD],[0.5,C_ORANGE],[1,C_BURN]],
                       title="Top 20 Most Active Users")
-        fig4.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="#FAFAFA",
-                           font=dict(color=C_DARK), height=360,
+        fig4.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="rgba(0,0,0,0)",
+                           font=dict(color="#FFFFFF"), height=360,
                            margin=dict(t=44,b=60,l=8,r=8),
-                           title_font=dict(size=13,color=C_DARK))
-        fig4.update_xaxes(tickangle=45, tickfont_size=7, gridcolor="#EEE", color=C_DARK)
-        fig4.update_yaxes(gridcolor="#EEE", color=C_DARK)
+                           title_font=dict(size=13,color="#FFFFFF"))
+        fig4.update_xaxes(tickangle=45, tickfont_size=7, gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
+        fig4.update_yaxes(gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
         st.plotly_chart(fig4, key="usr_top20")
         st.dataframe(top20u, hide_index=False)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1151,11 +1151,11 @@ elif page == "users":
                          color_continuous_scale=[[0,"#FFF8E7"],[0.5,C_ORANGE],[1,C_BURN]],
                          title="Rating Heatmap by User Segment",
                          labels=dict(x="Star Rating", y="Segment", color="Count"))
-        fig5.update_layout(paper_bgcolor=C_CARD, font=dict(color=C_DARK), height=340,
+        fig5.update_layout(paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#FFFFFF"), height=340,
                            margin=dict(t=44,b=30,l=80,r=20),
-                           title_font=dict(size=13,color=C_DARK))
-        fig5.update_xaxes(color=C_DARK)
-        fig5.update_yaxes(color=C_DARK)
+                           title_font=dict(size=13,color="#FFFFFF"))
+        fig5.update_xaxes(color="#FFFFFF")
+        fig5.update_yaxes(color="#FFFFFF")
         st.plotly_chart(fig5, key="usr_heat")
         st.markdown('<div class="insight-box">Power users lean heavily toward 5-star ratings, amplifying the positivity bias in the training data. The Hybrid model down-weights this using a Bayesian prior.</div>', unsafe_allow_html=True)
         st.markdown('</div>', unsafe_allow_html=True)
@@ -1189,8 +1189,8 @@ elif page == "models":
             top_border = f"border-top:4px solid {C_ORANGE}" if rmse==RESULTS['RMSE'].min() else f"border-top:4px solid {C_GOLD}"
             badge = f'<span style="background:{C_ORANGE};color:{C_DARK};font-size:0.65rem;font-weight:700;padding:2px 7px;border-radius:10px;margin-left:5px">BEST</span>' if rmse==RESULTS['RMSE'].min() else ''
             st.markdown(f"""
-<div style="background:#FAFAFA;border:1px solid #E0E0E0;{top_border};border-radius:8px;padding:14px;min-height:190px">
-  <div style="font-weight:700;color:{C_DARK};font-size:0.88rem">{name}{badge}</div>
+<div style="background:rgba(25, 32, 51, 0.5);border:1px solid rgba(255, 255, 255, 0.08);{top_border};border-radius:8px;padding:14px;min-height:190px">
+  <div style="font-weight:700;color:#FFFFFF;font-size:0.88rem">{name}{badge}</div>
   <div style="font-size:0.73rem;color:{C_TEAL};margin:4px 0;font-style:italic">{algo}</div>
   <div style="font-size:0.77rem;color:{C_TEXT};margin-top:8px;line-height:1.5">{desc}</div>
   <div style="margin-top:10px;font-size:0.75rem;color:{C_SUB}">RMSE: <b style="color:{C_BURN}">{rmse}</b></div>
@@ -1214,12 +1214,12 @@ elif page == "models":
                 y=[row[m] for m in sel_metrics],
                 marker_color=MODEL_COLORS[i],
             ))
-        fig.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="#FAFAFA",
-                          font=dict(color=C_DARK), height=360,
+        fig.update_layout(paper_bgcolor=C_CARD, plot_bgcolor="rgba(0,0,0,0)",
+                          font=dict(color="#FFFFFF"), height=360,
                           margin=dict(t=20,b=30), barmode="group",
                           legend=dict(bgcolor="#F9F9F9",bordercolor="#DDD",borderwidth=1))
-        fig.update_xaxes(gridcolor="#EEE", color=C_DARK)
-        fig.update_yaxes(gridcolor="#EEE", color=C_DARK)
+        fig.update_xaxes(gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
+        fig.update_yaxes(gridcolor="rgba(255,255,255,0.08)", color="#FFFFFF")
         st.plotly_chart(fig, key="mc_grouped")
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -1292,11 +1292,11 @@ elif page == "perf":
                          color_continuous_scale=[[0,"#FFF"],[0.3,C_GOLD],[0.7,C_ORANGE],[1,C_BURN]],
                          title="Products by Rating Range × Review Count",
                          labels=dict(x="Review Count Range", y="Avg Rating Range", color="# Products"))
-        fig4.update_layout(paper_bgcolor=C_CARD, font=dict(color=C_DARK), height=360,
+        fig4.update_layout(paper_bgcolor="rgba(0,0,0,0)", font=dict(color="#FFFFFF"), height=360,
                            margin=dict(t=44,b=40,l=80,r=20),
-                           title_font=dict(size=13,color=C_DARK))
-        fig4.update_xaxes(color=C_DARK)
-        fig4.update_yaxes(color=C_DARK)
+                           title_font=dict(size=13,color="#FFFFFF"))
+        fig4.update_xaxes(color="#FFFFFF")
+        fig4.update_yaxes(color="#FFFFFF")
         st.plotly_chart(fig4, key="pf_heat")
         st.markdown('</div>', unsafe_allow_html=True)
 
